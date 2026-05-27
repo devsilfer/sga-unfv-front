@@ -2,16 +2,11 @@ import { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus, Pencil, Trash2, EllipsisVertical } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 
 import { DataTable } from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import FormModal from '@/components/FormModal'
 import { Input } from '@/components/ui/input'
 
 import { findAll as findUsuarios, create as createUsuario, update as updateUsuario, softRemove as deleteUsuario } from '@/features/seguridad/api/usuarios.api'
@@ -127,24 +122,20 @@ export default function UsuariosPage() {
       },
       {
         id: 'acciones',
+        header: '',
         cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="ghost" size="icon-sm"><EllipsisVertical className="h-4 w-4" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
-                <Pencil className="h-4 w-4" /> Editar
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={() => {
-                if (confirm('¿Eliminar este usuario?')) deleteMutation.mutate(row.original.id)
-              }}>
-                <Trash2 className="h-4 w-4" /> Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon-sm" onClick={() => handleEdit(row.original)}
+              className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={() => {
+              if (confirm('¿Eliminar este usuario?')) deleteMutation.mutate(row.original.id)
+            }}
+              className="bg-red-100 text-red-700 hover:bg-red-200">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         ),
       },
     ],
@@ -163,32 +154,26 @@ export default function UsuariosPage() {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={(v: boolean) => { if (!v) handleClose() }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Editar Usuario' : 'Nuevo Usuario'}</DialogTitle>
-            <DialogDescription>Ingresa los datos del usuario</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">ID Persona</label>
-              <Input type="number" value={form.personaId || ''} onChange={(e) => setForm({ ...form, personaId: Number(e.target.value) })} />
-              {errors.personaId && <p className="text-xs text-destructive">{errors.personaId}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Contraseña {editing && '(dejar vacío para mantener)'}</label>
-              <Input type="password" value={form.contrasenia} onChange={(e) => setForm({ ...form, contrasenia: e.target.value })} />
-              {errors.contrasenia && <p className="text-xs text-destructive">{errors.contrasenia}</p>}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-            <Button onClick={handleSubmit} disabled={saving}>
-              {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <FormModal
+        open={open}
+        onOpenChange={handleClose}
+        title={editing ? 'Editar Usuario' : 'Nuevo Usuario'}
+        description="Ingresa los datos del usuario"
+        editing={!!editing}
+        saving={saving}
+        onSubmit={handleSubmit}
+      >
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">ID Persona</label>
+          <Input type="number" value={form.personaId || ''} onChange={(e) => setForm({ ...form, personaId: Number(e.target.value) })} />
+          {errors.personaId && <p className="text-xs text-destructive">{errors.personaId}</p>}
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Contraseña {editing && '(dejar vacío para mantener)'}</label>
+          <Input type="password" value={form.contrasenia} onChange={(e) => setForm({ ...form, contrasenia: e.target.value })} />
+          {errors.contrasenia && <p className="text-xs text-destructive">{errors.contrasenia}</p>}
+        </div>
+      </FormModal>
 
       <DataTable
         columns={columns}

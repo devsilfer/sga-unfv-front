@@ -114,7 +114,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = location.pathname
 
   return (
-    <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-thin scrollbar-thumb-gray-700">
+    <nav className="flex-1 overflow-y-auto px-3 py-4 scrollbar-none">
       <div className="space-y-1">
         {navigation.map((item) => {
           if (item.type === 'link') {

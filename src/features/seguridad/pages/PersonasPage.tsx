@@ -2,17 +2,11 @@ import { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus, Pencil, Trash2, EllipsisVertical, UserCheck } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 
 import { DataTable } from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import FormModal from '@/components/FormModal'
 import { Input } from '@/components/ui/input'
 
 import { findAll as findPersonas, create as createPersona, update as updatePersona, softRemove as deletePersona } from '@/features/seguridad/api/personas.api'
@@ -148,34 +142,21 @@ export default function PersonasPage() {
         accessorFn: (row) => row.genero?.nombre || '-',
       },
       {
-        id: 'esActivo',
-        header: 'Estado',
-        cell: () => (
-          <Badge className="bg-green-100 text-green-700">
-            <UserCheck className="h-3 w-3" />Activo
-          </Badge>
-        ),
-      },
-      {
         id: 'acciones',
+        header: '',
         cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="ghost" size="icon-sm"><EllipsisVertical className="h-4 w-4" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
-                <Pencil className="h-4 w-4" /> Editar
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" onClick={() => {
-                if (confirm('¿Eliminar esta persona?')) deleteMutation.mutate(row.original.id)
-              }}>
-                <Trash2 className="h-4 w-4" /> Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon-sm" onClick={() => handleEdit(row.original)}
+              className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={() => {
+              if (confirm('¿Eliminar esta persona?')) deleteMutation.mutate(row.original.id)
+            }}
+              className="bg-red-100 text-red-700 hover:bg-red-200">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         ),
       },
     ],
@@ -194,71 +175,61 @@ export default function PersonasPage() {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={(v: boolean | undefined) => { if (!v) handleClose() }}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Editar Persona' : 'Nueva Persona'}</DialogTitle>
-            <DialogDescription>
-              {editing ? 'Modifica los datos de la persona' : 'Ingresa los datos de la nueva persona'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="grid gap-4 py-2">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">N° Documento</label>
-                <Input value={form.numeroDocumento} onChange={(e) => setForm({ ...form, numeroDocumento: e.target.value })} />
-                {errors.numeroDocumento && <p className="text-xs text-destructive">{errors.numeroDocumento}</p>}
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Correo Personal</label>
-                <Input value={form.correoPersonal} onChange={(e) => setForm({ ...form, correoPersonal: e.target.value })} />
-                {errors.correoPersonal && <p className="text-xs text-destructive">{errors.correoPersonal}</p>}
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Nombres</label>
-              <Input value={form.nombres} onChange={(e) => setForm({ ...form, nombres: e.target.value })} />
-              {errors.nombres && <p className="text-xs text-destructive">{errors.nombres}</p>}
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Apellido Paterno</label>
-                <Input value={form.apellidoPaterno} onChange={(e) => setForm({ ...form, apellidoPaterno: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Apellido Materno</label>
-                <Input value={form.apellidoMaterno} onChange={(e) => setForm({ ...form, apellidoMaterno: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Fecha Nacimiento</label>
-                <Input type="date" value={form.fecNac} onChange={(e) => setForm({ ...form, fecNac: e.target.value })} />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Celular</label>
-                <Input value={form.numCelular} onChange={(e) => setForm({ ...form, numCelular: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Dirección</label>
-              <Input value={form.direccion} onChange={(e) => setForm({ ...form, direccion: e.target.value })} />
-            </div>
+      <FormModal
+        open={open}
+        onOpenChange={handleClose}
+        title={editing ? 'Editar Persona' : 'Nueva Persona'}
+        description={editing ? 'Modifica los datos de la persona' : 'Ingresa los datos de la nueva persona'}
+        editing={!!editing}
+        saving={saving}
+        onSubmit={handleSubmit}
+      >
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">N° Documento</label>
+            <Input value={form.numeroDocumento} onChange={(e) => setForm({ ...form, numeroDocumento: e.target.value })} />
+            {errors.numeroDocumento && <p className="text-xs text-destructive">{errors.numeroDocumento}</p>}
           </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Correo Personal</label>
+            <Input value={form.correoPersonal} onChange={(e) => setForm({ ...form, correoPersonal: e.target.value })} />
+            {errors.correoPersonal && <p className="text-xs text-destructive">{errors.correoPersonal}</p>}
+          </div>
+        </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-            <Button onClick={handleSubmit} disabled={saving}>
-              {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Nombres</label>
+          <Input value={form.nombres} onChange={(e) => setForm({ ...form, nombres: e.target.value })} />
+          {errors.nombres && <p className="text-xs text-destructive">{errors.nombres}</p>}
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Apellido Paterno</label>
+            <Input value={form.apellidoPaterno} onChange={(e) => setForm({ ...form, apellidoPaterno: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Apellido Materno</label>
+            <Input value={form.apellidoMaterno} onChange={(e) => setForm({ ...form, apellidoMaterno: e.target.value })} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Fecha Nacimiento</label>
+            <Input type="date" value={form.fecNac} onChange={(e) => setForm({ ...form, fecNac: e.target.value })} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Celular</label>
+            <Input value={form.numCelular} onChange={(e) => setForm({ ...form, numCelular: e.target.value })} />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Dirección</label>
+          <Input value={form.direccion} onChange={(e) => setForm({ ...form, direccion: e.target.value })} />
+        </div>
+      </FormModal>
 
       <DataTable
         columns={columns}

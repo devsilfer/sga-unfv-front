@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/stores/auth.store'
-import { LogOut, Bell, ChevronRight, Home, Menu } from 'lucide-react'
+import { useThemeStore } from '@/stores/theme.store'
+import { LogOut, Bell, ChevronRight, Home, Menu, Sun, Moon } from 'lucide-react'
 import Sidebar, { MobileSidebar } from '@/components/Sidebar'
 
 const breadcrumbMap: Record<string, string> = {
@@ -20,6 +21,7 @@ const moduleGroupMap: Record<string, string> = {
 
 export default function DashboardLayout() {
   const { user, logout } = useAuthStore()
+  const { theme, toggle: toggleTheme } = useThemeStore()
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -85,6 +87,14 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
+            <button
+              onClick={toggleTheme}
+              className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+              title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
+            >
+              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            </button>
+
             <button className="relative rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors">
               <Bell className="h-5 w-5" />
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
