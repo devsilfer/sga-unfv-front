@@ -1,28 +1,10 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard,
-  Shield,
-  Users,
-  UserCog,
-  ShieldCheck,
-  Briefcase,
-  Boxes,
-  KeyRound,
-  GraduationCap,
-  BookOpen,
-  Building2,
-  ClipboardCheck,
-  Presentation,
-  ClipboardList,
-  DollarSign,
-  FileText,
-  Award,
-  Database,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  Calendar,
+  LayoutDashboard, Shield, Users, UserCog, ShieldCheck,
+  Briefcase, Boxes, KeyRound, ChevronDown, ChevronRight,
+  GraduationCap, BookOpen, Building2, ClipboardCheck,
+  Presentation, ClipboardList, DollarSign, FileText, Award, Database,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -44,6 +26,10 @@ type NavItem = {
   label: string
   icon: LucideIcon
   children: NavChild[]
+} | {
+  type: 'label'
+  label: string
+  icon: LucideIcon
 }
 
 const navigation: NavItem[] = [
@@ -59,93 +45,17 @@ const navigation: NavItem[] = [
       { label: 'Permisos', icon: KeyRound, path: '/seguridad/permisos' },
     ],
   },
-  {
-    type: 'group', label: 'Admisión', icon: GraduationCap,
-    children: [
-      { label: 'Procesos', icon: ClipboardList, path: '/admision/procesos' },
-      { label: 'Exámenes', icon: FileText, path: '/admision/examenes' },
-      { label: 'Postulantes', icon: Users, path: '/admision/postulantes' },
-      { label: 'Preguntas', icon: Boxes, path: '/admision/preguntas' },
-      { label: 'Modalidades', icon: Briefcase, path: '/admision/modalidades' },
-      { label: 'Ambientes', icon: Building2, path: '/admision/ambientes' },
-    ],
-  },
-  {
-    type: 'group', label: 'Estructura Curricular', icon: BookOpen,
-    children: [
-      { label: 'Programas', icon: BookOpen, path: '/est-curricular/programas' },
-      { label: 'Planes', icon: FileText, path: '/est-curricular/planes' },
-      { label: 'Cursos', icon: BookOpen, path: '/est-curricular/cursos' },
-      { label: 'Ciclos', icon: Boxes, path: '/est-curricular/ciclos' },
-    ],
-  },
-  {
-    type: 'group', label: 'Estructura Institucional', icon: Building2,
-    children: [
-      { label: 'Facultades', icon: Building2, path: '/est-institucional/facultades' },
-      { label: 'Escuelas', icon: GraduationCap, path: '/est-institucional/escuelas' },
-      { label: 'Aulas', icon: Presentation, path: '/est-institucional/aulas' },
-    ],
-  },
-  {
-    type: 'group', label: 'Gestión Académica', icon: ClipboardCheck,
-    children: [
-      { label: 'Notas', icon: ClipboardCheck, path: '/gestion-academica/notas' },
-      { label: 'Clases', icon: Presentation, path: '/gestion-academica/clases' },
-      { label: 'Asistencia', icon: ClipboardList, path: '/gestion-academica/asistencia' },
-    ],
-  },
-  {
-    type: 'group', label: 'Docente', icon: Presentation,
-    children: [
-      { label: 'Docentes', icon: Users, path: '/docente/docentes' },
-      { label: 'Actividades', icon: ClipboardList, path: '/docente/actividades' },
-      { label: 'Carga', icon: Briefcase, path: '/docente/carga' },
-    ],
-  },
-  {
-    type: 'group', label: 'Matrícula', icon: ClipboardList,
-    children: [
-      { label: 'Estudiantes', icon: Users, path: '/matricula/estudiantes' },
-      { label: 'Horarios', icon: Clock, path: '/matricula/horarios' },
-      { label: 'Periodos', icon: Calendar, path: '/matricula/periodos' },
-    ],
-  },
-  {
-    type: 'group', label: 'Tesorería', icon: DollarSign,
-    children: [
-      { label: 'Pagos', icon: DollarSign, path: '/tesoreria/pagos' },
-      { label: 'Conceptos', icon: FileText, path: '/tesoreria/conceptos' },
-    ],
-  },
-  {
-    type: 'group', label: 'Mesa de Partes', icon: FileText,
-    children: [
-      { label: 'Trámites', icon: FileText, path: '/mesa-partes/tramites' },
-    ],
-  },
-  {
-    type: 'group', label: 'Titulación', icon: Award,
-    children: [
-      { label: 'Trabajos', icon: FileText, path: '/titulacion/trabajos' },
-      { label: 'Etapas', icon: Boxes, path: '/titulacion/etapas' },
-    ],
-  },
-  {
-    type: 'group', label: 'Bolsa Laboral', icon: Briefcase,
-    children: [
-      { label: 'Vacantes', icon: Briefcase, path: '/bolsa-laboral/vacantes' },
-      { label: 'Empresas', icon: Building2, path: '/bolsa-laboral/empresas' },
-      { label: 'Postulaciones', icon: Users, path: '/bolsa-laboral/postulaciones' },
-    ],
-  },
-  {
-    type: 'group', label: 'Maestras', icon: Database,
-    children: [
-      { label: 'Ubigeos', icon: Database, path: '/maestras/ubigeos' },
-      { label: 'Tipos Identificación', icon: KeyRound, path: '/maestras/tipos-identificacion' },
-    ],
-  },
+  { type: 'label', label: 'Admisión', icon: GraduationCap },
+  { type: 'label', label: 'Estructura Curricular', icon: BookOpen },
+  { type: 'label', label: 'Estructura Institucional', icon: Building2 },
+  { type: 'label', label: 'Gestión Académica', icon: ClipboardCheck },
+  { type: 'label', label: 'Docente', icon: Presentation },
+  { type: 'label', label: 'Matrícula', icon: ClipboardList },
+  { type: 'label', label: 'Tesorería', icon: DollarSign },
+  { type: 'label', label: 'Mesa de Partes', icon: FileText },
+  { type: 'label', label: 'Titulación', icon: Award },
+  { type: 'label', label: 'Bolsa Laboral', icon: Briefcase },
+  { type: 'label', label: 'Maestras', icon: Database },
 ]
 
 function NavLink({ icon: Icon, label, active, onClick }: {
@@ -217,6 +127,15 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 active={active}
                 onClick={() => handleNavigate(item.path)}
               />
+            )
+          }
+
+          if (item.type === 'label') {
+            return (
+              <div key={item.label} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-600 cursor-default">
+                <item.icon className="h-4 w-4 shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </div>
             )
           }
 
