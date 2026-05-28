@@ -1,6 +1,12 @@
 import apiClient from '@/api/client'
 import type { Cargo, CreateCargoInput, UpdateCargoInput } from '../types/cargo.types'
 import type { PaginatedResponse } from '@/types/pagination.types'
+import type { ComboOption } from '@/types/combo.types'
+
+export async function findCombo(): Promise<ComboOption[]> {
+  const { data } = await apiClient.get<ComboOption[]>('/cargos/combo')
+  return data
+}
 
 export async function findAll(): Promise<Cargo[]>
 export async function findAll(page: number, limit?: number): Promise<PaginatedResponse<Cargo>>

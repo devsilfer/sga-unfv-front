@@ -32,10 +32,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-sm space-y-6 rounded-lg border bg-white p-8 shadow-sm animate-scale-in">
+    <div className="w-full max-w-sm space-y-6 rounded-lg border border-border bg-card p-8 shadow-sm animate-scale-in">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">SGA UNFV</h1>
-        <p className="mt-1 text-sm text-gray-500">Inicia sesión para continuar</p>
+        <h1 className="text-2xl font-bold text-foreground">SGA UNFV</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Inicia sesión para continuar</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -49,7 +49,7 @@ export default function LoginPage() {
             value={numeroDocumento}
             onChange={(e) => setNumeroDocumento(e.target.value)}
             required
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             placeholder="Ingrese su documento"
           />
         </div>
@@ -64,7 +64,7 @@ export default function LoginPage() {
             value={contrasenia}
             onChange={(e) => setContrasenia(e.target.value)}
             required
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             placeholder="Ingrese su contraseña"
           />
         </div>
@@ -76,10 +76,10 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
         >
           {loading ? (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
           ) : (
             <LogIn className="h-4 w-4" />
           )}

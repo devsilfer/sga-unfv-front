@@ -8,8 +8,12 @@ import { DataTable } from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import FormModal from '@/components/FormModal'
 import { Input } from '@/components/ui/input'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
 
 import { findAll as findUsuarios, create as createUsuario, update as updateUsuario, softRemove as deleteUsuario } from '@/features/seguridad/api/usuarios.api'
+import { findAll as findPersonas } from '@/features/seguridad/api/personas.api'
 import type { Usuario } from '@/features/seguridad/types/usuario.types'
 
 const emptyForm = { personaId: 0, contrasenia: '' }
@@ -29,6 +33,14 @@ export default function UsuariosPage() {
   })
   const usuarios = result?.data || []
   const pageCount = result?.meta?.lastPage || 1
+  const { data: personas = [] } = useQuery({
+    queryKey: ['personas-list'],
+    queryFn: () => findPersonas(),
+  })
+  const personaItems = useMemo(() => Object.fromEntries(personas.map(p => [
+    String(p.id),
+    `${p.nombres} ${p.apellidoPaterno || ''} - ${p.numeroDocumento}`,
+  ])), [personas])
 
   const createMutation = useMutation({
     mutationFn: (input: typeof form) => createUsuario({
@@ -126,13 +138,13 @@ export default function UsuariosPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon-sm" onClick={() => handleEdit(row.original)}
-              className="bg-blue-100 text-blue-700 hover:bg-blue-200">
+              className="bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
               <Pencil className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon-sm" onClick={() => {
               if (confirm('¿Eliminar este usuario?')) deleteMutation.mutate(row.original.id)
             }}
-              className="bg-red-100 text-red-700 hover:bg-red-200">
+              className="bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
@@ -146,8 +158,8 @@ export default function UsuariosPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
-          <p className="mt-1 text-sm text-gray-500">Gestión de usuarios del sistema</p>
+          <h1 className="text-2xl font-bold text-foreground">Usuarios</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Gestión de usuarios del sistema</p>
         </div>
         <Button onClick={() => setOpen(true)} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Nuevo Usuario
@@ -164,8 +176,17 @@ export default function UsuariosPage() {
         onSubmit={handleSubmit}
       >
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">ID Persona</label>
-          <Input type="number" value={form.personaId || ''} onChange={(e) => setForm({ ...form, personaId: Number(e.target.value) })} />
+          <label className="text-sm font-medium">Persona</label>
+          <Select value={form.personaId ? String(form.personaId) : undefined} items={personaItems} onValueChange={(v) => setForm({ ...form, personaId: Number(v) })}>
+            <SelectTrigger><SelectValue placeholder="Seleccionar persona" /></SelectTrigger>
+            <SelectContent>
+              {personas.map((p) => (
+                <SelectItem key={p.id} value={String(p.id)}>
+                  {p.nombres} {p.apellidoPaterno || ''} - {p.numeroDocumento}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {errors.personaId && <p className="text-xs text-destructive">{errors.personaId}</p>}
         </div>
         <div className="space-y-1.5">

@@ -13,6 +13,7 @@ export interface Cargo {
 export type CreateCargoInput = {
   codigo: string
   nombre: string
+  areaId?: number | null
   esActivo?: number
 }
 

@@ -39,12 +39,12 @@ export default function PagePlaceholder({ module }: { module: string }) {
   const label = labelMap[module] || module
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-gray-400 animate-fade-in">
-      <div className="rounded-xl bg-gray-100 p-6 transition-transform duration-300 hover:scale-105">
-        <Icon className="h-16 w-16 text-gray-300" />
+    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-fade-in">
+      <div className="rounded-xl bg-muted p-6 transition-transform duration-300 hover:scale-105">
+        <Icon className="h-16 w-16 text-muted-foreground/50" />
       </div>
-      <h2 className="mt-6 text-xl font-semibold text-gray-600">{label}</h2>
-      <p className="mt-2 text-sm text-gray-400">
+      <h2 className="mt-6 text-xl font-semibold text-foreground">{label}</h2>
+      <p className="mt-2 text-sm text-muted-foreground">
         Módulo en desarrollo — Próximamente disponible
       </p>
     </div>

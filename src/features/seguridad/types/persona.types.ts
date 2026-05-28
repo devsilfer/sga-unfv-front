@@ -45,6 +45,7 @@ export interface Persona {
 }
 
 export type CreatePersonaInput = {
+  tipoIdentificacionId?: number
   numeroDocumento: string
   correoPersonal: string
   nombres: string
@@ -53,7 +54,9 @@ export type CreatePersonaInput = {
   fecNac?: string
   numCelular?: string
   avatarUrl?: string
+  generoId?: number
   ubigeoId?: string
+  paisId?: number
   direccion?: string
 }
 

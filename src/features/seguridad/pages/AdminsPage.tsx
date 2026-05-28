@@ -2,21 +2,21 @@ import { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus, Pencil, Trash2, EllipsisVertical, UserCheck, UserX } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 
 import { DataTable } from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import FormModal from '@/components/FormModal'
 import { Input } from '@/components/ui/input'
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select'
 
 import { findAll as findAdmins, create as createAdmin, update as updateAdmin, softRemove as deleteAdmin } from '@/features/seguridad/api/admins.api'
+import { findAll as findUsuarios } from '@/features/seguridad/api/usuarios.api'
+import { findCombo as findCargosCombo } from '@/features/seguridad/api/cargos.api'
 import type { Admin } from '@/features/seguridad/types/admin.types'
+import { toItemsRecord } from '@/lib/combo'
 
 const emptyForm = { usuarioId: 0, cargoId: 0, codigo: '', correo: '' }
 
@@ -32,6 +32,15 @@ export default function AdminsPage() {
   const { data: result, isLoading } = useQuery({ queryKey: ['admins', page], queryFn: () => findAdmins(page) })
   const admins = result?.data || []
   const pageCount = result?.meta?.lastPage || 1
+  const { data: usuariosList = [] } = useQuery({ queryKey: ['usuarios-list'], queryFn: () => findUsuarios() })
+  const { data: cargosCombo = [] } = useQuery({ queryKey: ['cargos-combo'], queryFn: () => findCargosCombo() })
+
+  const usuarioItems = useMemo(() => Object.fromEntries(usuariosList.map(u => [
+    String(u.id),
+    u.persona ? `${u.persona.nombres} ${u.persona.apellidoPaterno || ''}`.trim() : `Usuario #${u.id}`,
+  ])), [usuariosList])
+  const cargoItems = useMemo(() => toItemsRecord(cargosCombo), [cargosCombo])
+
   const createMutation = useMutation({
     mutationFn: (input: typeof form) => createAdmin({
       usuarioId: Number(input.usuarioId),
@@ -61,8 +70,8 @@ export default function AdminsPage() {
   }
   function validate() {
     const e: Record<string, string> = {}
-    if (!form.usuarioId) e.usuarioId = 'Requerido'
-    if (!form.cargoId) e.cargoId = 'Requerido'
+    if (!form.usuarioId) e.usuarioId = 'Seleccione un usuario'
+    if (!form.cargoId) e.cargoId = 'Seleccione un cargo'
     if (!form.codigo) e.codigo = 'Requerido'
     if (!form.correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo)) e.correo = 'Correo inválido'
     setErrors(e); return Object.keys(e).length === 0
@@ -89,22 +98,19 @@ export default function AdminsPage() {
       accessorFn: (row) => row.cargo?.nombre || '-',
     },
     {
-      id: 'esActivo', header: 'Estado',
-      cell: ({ row }) => row.original.esActivo
-        ? <Badge className="bg-green-100 text-green-700"><UserCheck className="h-3 w-3" />Activo</Badge>
-        : <Badge variant="destructive"><UserX className="h-3 w-3" />Inactivo</Badge>,
-    },
-    {
       id: 'acciones', cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger><Button variant="ghost" size="icon-sm"><EllipsisVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => handleEdit(row.original)}><Pencil className="h-4 w-4" /> Editar</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => { if (confirm('¿Eliminar?')) deleteMutation.mutate(row.original.id) }}><Trash2 className="h-4 w-4" /> Eliminar</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon-sm" onClick={() => handleEdit(row.original)}
+            className="bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={() => {
+            if (confirm('¿Eliminar este admin?')) deleteMutation.mutate(row.original.id)
+          }}
+            className="bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ], [])
@@ -112,40 +118,57 @@ export default function AdminsPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div><h1 className="text-2xl font-bold">Admins</h1><p className="mt-1 text-sm text-gray-500">Gestión de administradores</p></div>
+        <div><h1 className="text-2xl font-bold text-foreground">Admins</h1><p className="mt-1 text-sm text-muted-foreground">Gestión de administradores</p></div>
         <Button onClick={() => setOpen(true)} className="w-full sm:w-auto"><Plus className="h-4 w-4" /> Nuevo Admin</Button>
       </div>
-      <Dialog open={open} onOpenChange={(v: boolean) => { if (!v) handleClose() }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>{editing ? 'Editar Admin' : 'Nuevo Admin'}</DialogTitle><DialogDescription>Ingresa los datos del administrador</DialogDescription></DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">ID Usuario</label>
-              <Input type="number" value={form.usuarioId || ''} onChange={(e) => setForm({ ...form, usuarioId: Number(e.target.value) })} />
-              {errors.usuarioId && <p className="text-xs text-destructive">{errors.usuarioId}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">ID Cargo</label>
-              <Input type="number" value={form.cargoId || ''} onChange={(e) => setForm({ ...form, cargoId: Number(e.target.value) })} />
-              {errors.cargoId && <p className="text-xs text-destructive">{errors.cargoId}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Código</label>
-              <Input value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value })} />
-              {errors.codigo && <p className="text-xs text-destructive">{errors.codigo}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Correo</label>
-              <Input value={form.correo} onChange={(e) => setForm({ ...form, correo: e.target.value })} />
-              {errors.correo && <p className="text-xs text-destructive">{errors.correo}</p>}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-            <Button onClick={handleSubmit} disabled={saving}>{saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
+      <FormModal
+        open={open}
+        onOpenChange={handleClose}
+        title={editing ? 'Editar Admin' : 'Nuevo Admin'}
+        description="Ingresa los datos del administrador"
+        editing={!!editing}
+        saving={saving}
+        onSubmit={handleSubmit}
+      >
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Usuario</label>
+          <Select value={form.usuarioId ? String(form.usuarioId) : undefined} items={usuarioItems} onValueChange={(v) => setForm({ ...form, usuarioId: Number(v) })}>
+            <SelectTrigger><SelectValue placeholder="Seleccionar usuario" /></SelectTrigger>
+            <SelectContent>
+              {usuariosList.map((u) => (
+                <SelectItem key={u.id} value={String(u.id)}>
+                  {u.persona ? `${u.persona.nombres} ${u.persona.apellidoPaterno || ''}`.trim() : `Usuario #${u.id}`}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.usuarioId && <p className="text-xs text-destructive">{errors.usuarioId}</p>}
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Cargo</label>
+          <Select value={form.cargoId ? String(form.cargoId) : undefined} items={cargoItems} onValueChange={(v) => setForm({ ...form, cargoId: Number(v) })}>
+            <SelectTrigger><SelectValue placeholder="Seleccionar cargo" /></SelectTrigger>
+            <SelectContent>
+              {cargosCombo.map((c) => (
+                <SelectItem key={c.value} value={String(c.value)}>{c.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.cargoId && <p className="text-xs text-destructive">{errors.cargoId}</p>}
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Código</label>
+          <Input value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value })} />
+          {errors.codigo && <p className="text-xs text-destructive">{errors.codigo}</p>}
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Correo</label>
+          <Input value={form.correo} onChange={(e) => setForm({ ...form, correo: e.target.value })} />
+          {errors.correo && <p className="text-xs text-destructive">{errors.correo}</p>}
+        </div>
+      </FormModal>
+
       <DataTable columns={columns} data={admins} searchKey="codigo" searchPlaceholder="Buscar por código..." loading={isLoading} page={page} pageCount={pageCount} onPageChange={setPage} />
     </div>
   )

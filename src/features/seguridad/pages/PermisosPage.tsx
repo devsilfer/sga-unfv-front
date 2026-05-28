@@ -2,17 +2,12 @@ import { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus, Pencil, Trash2, EllipsisVertical, UserCheck, UserX, Check, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, UserCheck, UserX, Check, X } from 'lucide-react'
 
 import { DataTable } from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import FormModal from '@/components/FormModal'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
@@ -39,6 +34,9 @@ export default function PermisosPage() {
   const pageCount = result?.meta?.lastPage || 1
   const { data: cargos = [] } = useQuery({ queryKey: ['cargos-list'], queryFn: () => findCargos() })
   const { data: modulos = [] } = useQuery({ queryKey: ['modulos-list'], queryFn: () => findModulos() })
+
+  const cargoItems = useMemo(() => Object.fromEntries(cargos.map(c => [String(c.id), c.nombre])), [cargos])
+  const moduloItems = useMemo(() => Object.fromEntries(modulos.map(m => [String(m.id), m.nombre])), [modulos])
 
   const createMutation = useMutation({
     mutationFn: (input: typeof form) => createPermiso({
@@ -101,37 +99,40 @@ export default function PermisosPage() {
     },
     {
       id: 'crear', header: 'Crear',
-      cell: ({ row }) => row.original.crear ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-red-400" />,
+      cell: ({ row }) => row.original.crear ? <Check className="h-4 w-4 text-green-600 dark:text-green-400" /> : <X className="h-4 w-4 text-red-400 dark:text-red-500" />,
     },
     {
       id: 'leer', header: 'Leer',
-      cell: ({ row }) => row.original.leer ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-red-400" />,
+      cell: ({ row }) => row.original.leer ? <Check className="h-4 w-4 text-green-600 dark:text-green-400" /> : <X className="h-4 w-4 text-red-400 dark:text-red-500" />,
     },
     {
       id: 'actualizar', header: 'Actualizar',
-      cell: ({ row }) => row.original.actualizar ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-red-400" />,
+      cell: ({ row }) => row.original.actualizar ? <Check className="h-4 w-4 text-green-600 dark:text-green-400" /> : <X className="h-4 w-4 text-red-400 dark:text-red-500" />,
     },
     {
       id: 'eliminar', header: 'Eliminar',
-      cell: ({ row }) => row.original.eliminar ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-red-400" />,
+      cell: ({ row }) => row.original.eliminar ? <Check className="h-4 w-4 text-green-600 dark:text-green-400" /> : <X className="h-4 w-4 text-red-400 dark:text-red-500" />,
     },
     {
-      id: 'esActivo', header: 'Estado',
+      id: 'estado', header: 'Estado',
       cell: ({ row }) => row.original.esActivo
-        ? <Badge className="bg-green-100 text-green-700"><UserCheck className="h-3 w-3" />Activo</Badge>
+        ? <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"><UserCheck className="h-3 w-3" />Activo</Badge>
         : <Badge variant="destructive"><UserX className="h-3 w-3" />Inactivo</Badge>,
     },
     {
       id: 'acciones', cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger><Button variant="ghost" size="icon-sm"><EllipsisVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => handleEdit(row.original)}><Pencil className="h-4 w-4" /> Editar</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => { if (confirm('¿Eliminar?')) deleteMutation.mutate(row.original.id) }}><Trash2 className="h-4 w-4" /> Eliminar</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon-sm" onClick={() => handleEdit(row.original)}
+            className="bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={() => {
+            if (confirm('¿Eliminar este permiso?')) deleteMutation.mutate(row.original.id)
+          }}
+            className="bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       ),
     },
   ], [])
@@ -139,62 +140,63 @@ export default function PermisosPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div><h1 className="text-2xl font-bold">Permisos</h1><p className="mt-1 text-sm text-gray-500">Gestión de permisos por cargo y módulo</p></div>
+        <div><h1 className="text-2xl font-bold text-foreground">Permisos</h1><p className="mt-1 text-sm text-muted-foreground">Gestión de permisos por cargo y módulo</p></div>
         <Button onClick={() => setOpen(true)} className="w-full sm:w-auto"><Plus className="h-4 w-4" /> Nuevo Permiso</Button>
       </div>
-      <Dialog open={open} onOpenChange={(v: boolean) => { if (!v) handleClose() }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>{editing ? 'Editar Permiso' : 'Nuevo Permiso'}</DialogTitle><DialogDescription>Selecciona el cargo, módulo y permisos CRUD</DialogDescription></DialogHeader>
-          <div className="grid gap-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Cargo</label>
-              <Select value={String(form.cargoId)} onValueChange={(v) => setForm({ ...form, cargoId: Number(v) })}>
-                <SelectTrigger><SelectValue placeholder="Seleccionar cargo" /></SelectTrigger>
-                <SelectContent>
-                  {cargos.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.cargoId && <p className="text-xs text-destructive">{errors.cargoId}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Módulo</label>
-              <Select value={String(form.moduloId)} onValueChange={(v) => setForm({ ...form, moduloId: Number(v) })}>
-                <SelectTrigger><SelectValue placeholder="Seleccionar módulo" /></SelectTrigger>
-                <SelectContent>
-                  {modulos.map((m) => (
-                    <SelectItem key={m.id} value={String(m.id)}>{m.nombre}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.moduloId && <p className="text-xs text-destructive">{errors.moduloId}</p>}
-            </div>
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox checked={form.crear} onCheckedChange={(v: boolean) => setForm({ ...form, crear: v })} />
-                Crear
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox checked={form.leer} onCheckedChange={(v: boolean) => setForm({ ...form, leer: v })} />
-                Leer
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox checked={form.actualizar} onCheckedChange={(v: boolean) => setForm({ ...form, actualizar: v })} />
-                Actualizar
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox checked={form.eliminar} onCheckedChange={(v: boolean) => setForm({ ...form, eliminar: v })} />
-                Eliminar
-              </label>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleClose}>Cancelar</Button>
-            <Button onClick={handleSubmit} disabled={saving}>{saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear'}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
+      <FormModal
+        open={open}
+        onOpenChange={handleClose}
+        title={editing ? 'Editar Permiso' : 'Nuevo Permiso'}
+        description="Selecciona el cargo, módulo y permisos CRUD"
+        editing={!!editing}
+        saving={saving}
+        onSubmit={handleSubmit}
+      >
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Cargo</label>
+          <Select value={form.cargoId ? String(form.cargoId) : undefined} items={cargoItems} onValueChange={(v) => setForm({ ...form, cargoId: Number(v) })}>
+            <SelectTrigger><SelectValue placeholder="Seleccionar cargo" /></SelectTrigger>
+            <SelectContent>
+              {cargos.map((c) => (
+                <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.cargoId && <p className="text-xs text-destructive">{errors.cargoId}</p>}
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Módulo</label>
+          <Select value={form.moduloId ? String(form.moduloId) : undefined} items={moduloItems} onValueChange={(v) => setForm({ ...form, moduloId: Number(v) })}>
+            <SelectTrigger><SelectValue placeholder="Seleccionar módulo" /></SelectTrigger>
+            <SelectContent>
+              {modulos.map((m) => (
+                <SelectItem key={m.id} value={String(m.id)}>{m.nombre}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.moduloId && <p className="text-xs text-destructive">{errors.moduloId}</p>}
+        </div>
+        <div className="grid grid-cols-2 gap-4 pt-2">
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox checked={form.crear} onCheckedChange={(v: boolean) => setForm({ ...form, crear: v })} />
+            Crear
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox checked={form.leer} onCheckedChange={(v: boolean) => setForm({ ...form, leer: v })} />
+            Leer
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox checked={form.actualizar} onCheckedChange={(v: boolean) => setForm({ ...form, actualizar: v })} />
+            Actualizar
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox checked={form.eliminar} onCheckedChange={(v: boolean) => setForm({ ...form, eliminar: v })} />
+            Eliminar
+          </label>
+        </div>
+      </FormModal>
+
       <DataTable columns={columns} data={permisos} searchKey="cargo" searchPlaceholder="Buscar por cargo..." loading={isLoading} page={page} pageCount={pageCount} onPageChange={setPage} />
     </div>
   )
