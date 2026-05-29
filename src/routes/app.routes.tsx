@@ -75,12 +75,12 @@ export const router = createBrowserRouter(
           path: 'seguridad',
           element: <ModuleProtectedRoute moduleKey="seguridad" />,
           children: [
-            { path: 'personas', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Personas/Personas'))) },
-            { path: 'usuarios', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Usuarios/Usuarios'))) },
-            { path: 'admins', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Admins/Admins'))) },
-            { path: 'cargos', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Cargos/Cargos'))) },
-            { path: 'modulos', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Modulos/Modulos'))) },
-            { path: 'permisos', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Permisos/Permisos'))) },
+            { path: 'personas', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Personas/PersonasPage'))) },
+            { path: 'usuarios', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Usuarios/UsuariosPage'))) },
+            { path: 'admins', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Admins/AdminsPage'))) },
+            { path: 'cargos', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Cargos/CargosPage'))) },
+            { path: 'modulos', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Modulos/ModulosPage'))) },
+            { path: 'permisos', element: withSuspense(lazy(() => import('@/pages/admin/seguridad/Permisos/PermisosPage'))) },
           ],
         },
 
