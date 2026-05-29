@@ -37,8 +37,6 @@ export default function Modal({
   return (
     <Dialog open={open} onOpenChange={(v: boolean) => { if (!v) onOpenChange(false) }}>
       <DialogContent className={width || sizeClasses[size]}>
-        <div className="absolute inset-x-0 top-0 h-0.5 rounded-t-xl bg-gradient-to-r from-primary/80 via-primary to-primary/80" />
-
         <DialogHeader>
           <div className="flex items-start gap-3.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-sm ring-1 ring-primary/25">
