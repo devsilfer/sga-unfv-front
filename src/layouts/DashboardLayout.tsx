@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth.store'
-import { useThemeStore } from '@/store/theme.store'
+import { useTheme } from '@/store/theme.store'
+import { useAdminModulesStore } from '@/store/adminModules.store'
 import { LogOut, Bell, ChevronRight, Home, Menu, Sun, Moon } from 'lucide-react'
 import Sidebar, { MobileSidebar } from '@/components/Sidebar'
 
@@ -20,11 +21,18 @@ const moduleGroupMap: Record<string, string> = {
 }
 
 export default function DashboardLayout() {
-  const { user, logout } = useAuthStore()
-  const { theme, toggle: toggleTheme } = useThemeStore()
+  const { user, logout, activeRole } = useAuthStore()
+  const { actualTheme, setTheme } = useTheme()
+  const { fetchModules } = useAdminModulesStore()
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    if (activeRole === 'admin') {
+      fetchModules()
+    }
+  }, [activeRole, fetchModules])
 
   async function handleLogout() {
     await logout()
@@ -35,6 +43,10 @@ export default function DashboardLayout() {
   const currentLabel = breadcrumbMap[pathname] || ''
   const moduleKey = pathname.split('/')[1]
   const moduleLabel = moduleKey ? moduleGroupMap[moduleKey] : ''
+
+  const toggleTheme = () => {
+    setTheme(actualTheme === 'light' ? 'dark' : 'light')
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -90,9 +102,9 @@ export default function DashboardLayout() {
             <button
               onClick={toggleTheme}
               className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
+              title={actualTheme === 'light' ? 'Modo oscuro' : 'Modo claro'}
             >
-              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              {actualTheme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </button>
 
             <button className="relative rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">

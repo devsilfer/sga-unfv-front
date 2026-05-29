@@ -1,38 +1,34 @@
 import { create } from 'zustand'
 
-type Theme = 'light' | 'dark'
+type Theme = 'system' | 'light' | 'dark'
 
 interface ThemeState {
   theme: Theme
-  toggle: () => void
+  actualTheme: 'light' | 'dark'
+  setTheme: (theme: Theme) => void
 }
 
-function getInitialTheme(): Theme {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('theme')
-    if (stored === 'dark' || stored === 'light') return stored
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark'
-  }
+function getSystemTheme(): 'light' | 'dark' {
+  if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    return 'dark'
   return 'light'
 }
 
 function applyTheme(theme: Theme) {
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-  }
+  const resolved = theme === 'system' ? getSystemTheme() : theme
+  document.documentElement.classList.toggle('dark', resolved === 'dark')
   localStorage.setItem('theme', theme)
 }
 
-const initial = getInitialTheme()
+const initial: Theme = (typeof localStorage !== 'undefined' ? (localStorage.getItem('theme') as Theme) : 'system') || 'system'
 applyTheme(initial)
 
-export const useThemeStore = create<ThemeState>((set) => ({
+export const useTheme = create<ThemeState>((set) => ({
   theme: initial,
-  toggle: () => set((s) => {
-    const next = s.theme === 'light' ? 'dark' : 'light'
-    applyTheme(next)
-    return { theme: next }
-  }),
+  actualTheme: initial === 'system' ? getSystemTheme() : initial,
+  setTheme: (theme: Theme) => {
+    applyTheme(theme)
+    const actualTheme = theme === 'system' ? getSystemTheme() : theme
+    set({ theme, actualTheme })
+  },
 }))
