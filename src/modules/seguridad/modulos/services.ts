@@ -11,7 +11,8 @@ export async function findAll(page?: number, limit?: number): Promise<Modulo[] |
   const params: Record<string, number> = {}
   if (page) { params.page = page; params.limit = limit || 10 }
   const { data } = await apiClient.get('/modulos', { params })
-  return data
+  if (page) return data as PaginatedResponse<Modulo>
+  return Array.isArray(data) ? data : (data as PaginatedResponse<Modulo>).data
 }
 
 export async function findOne(id: number): Promise<Modulo> {

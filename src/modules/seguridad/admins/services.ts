@@ -11,7 +11,8 @@ export async function findAll(page?: number, limit?: number): Promise<Admin[] | 
   const params: Record<string, number> = {}
   if (page) { params.page = page; params.limit = limit || 10 }
   const { data } = await apiClient.get('/admins', { params })
-  return data
+  if (page) return data as PaginatedResponse<Admin>
+  return Array.isArray(data) ? data : (data as PaginatedResponse<Admin>).data
 }
 
 export async function findOne(id: number): Promise<Admin> {
