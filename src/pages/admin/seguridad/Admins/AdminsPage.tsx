@@ -46,7 +46,7 @@ export default function AdminsPage() {
       id: 'acciones', cell: ({ row }) => (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setOpen(true) }}
-            className="bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+            className="bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50">
             <Pencil className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon-sm" onClick={() => {
@@ -64,7 +64,7 @@ export default function AdminsPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div><h1 className="text-2xl font-bold text-foreground">Admins</h1><p className="mt-1 text-sm text-muted-foreground">Gestión de administradores</p></div>
-        <Button onClick={() => setOpen(true)} className="w-full sm:w-auto"><Plus className="h-4 w-4" /> Nuevo Admin</Button>
+        <Button variant="info" onClick={() => setOpen(true)} className="w-full sm:w-auto"><Plus className="h-4 w-4" /> Nuevo Admin</Button>
       </div>
 
       <AdminForm open={open} onOpenChange={handleClose} editing={editing} />

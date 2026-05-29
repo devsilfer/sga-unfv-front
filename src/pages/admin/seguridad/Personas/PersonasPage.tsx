@@ -68,7 +68,7 @@ export default function PersonasPage() {
               <Eye className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon-sm" tooltip="Editar" onClick={() => { setEditing(row.original); setOpen(true) }}
-              className="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30">
+              className="bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50">
               <Pencil className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon-sm" tooltip="Eliminar" onClick={() => {
@@ -91,7 +91,7 @@ export default function PersonasPage() {
           <h1 className="text-2xl font-bold text-foreground">Personas</h1>
           <p className="mt-1 text-sm text-muted-foreground">Gestión de personas registradas en el sistema</p>
         </div>
-        <Button onClick={() => setOpen(true)} className="w-full sm:w-auto">
+        <Button variant="info" onClick={() => setOpen(true)} className="w-full sm:w-auto">
           <Plus className="h-4 w-4" /> Nueva Persona
         </Button>
       </div>
