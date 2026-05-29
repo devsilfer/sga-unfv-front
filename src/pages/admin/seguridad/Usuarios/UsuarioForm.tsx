@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import FormModal from '@/components/FormModal'
+import Modal from '@/components/Modal'
 import { Input } from '@/components/ui/input'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -94,7 +94,7 @@ export default function UsuarioForm({ open, onOpenChange, editing }: Props) {
   }
 
   return (
-    <FormModal
+    <Modal
       open={open}
       onOpenChange={onOpenChange}
       title={editing ? 'Editar Usuario' : 'Nuevo Usuario'}
@@ -107,7 +107,7 @@ export default function UsuarioForm({ open, onOpenChange, editing }: Props) {
         <label className="text-sm font-medium">Persona</label>
         <Select value={form.personaId ? String(form.personaId) : ""} items={personaItems} onValueChange={(v) => setForm({ ...form, personaId: Number(v) })}>
           <SelectTrigger><SelectValue placeholder="Seleccionar persona" /></SelectTrigger>
-          <SelectContent>
+          <SelectContent searchable searchPlaceholder="Buscar persona...">
             {personas.map((p) => (
               <SelectItem key={p.id} value={String(p.id)}>
                 {p.nombres} {p.apellidoPaterno || ''} - {p.numeroDocumento}
@@ -122,6 +122,6 @@ export default function UsuarioForm({ open, onOpenChange, editing }: Props) {
         <Input type="password" value={form.contrasenia} onChange={(e) => setForm({ ...form, contrasenia: e.target.value })} />
         {errors.contrasenia && <p className="text-xs text-destructive">{errors.contrasenia}</p>}
       </div>
-    </FormModal>
+    </Modal>
   )
 }

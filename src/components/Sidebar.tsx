@@ -70,8 +70,8 @@ function NavLink({ icon: Icon, label, active, onClick }: {
       className={cn(
         'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
         active
-          ? 'bg-primary text-primary-foreground'
-          : 'text-gray-300 hover:bg-gray-800 hover:text-white',
+          ? 'bg-primary text-primary-foreground shadow-sm'
+          : 'text-slate-300 hover:bg-slate-800 hover:text-white',
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
@@ -132,7 +132,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
           if (item.type === 'label') {
             return (
-              <div key={item.label} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-600 cursor-default">
+              <div key={item.label} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 cursor-default">
                 <item.icon className="h-4 w-4 shrink-0" />
                 <span className="truncate">{item.label}</span>
               </div>
@@ -149,8 +149,8 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   groupActive
-                    ? 'text-blue-400'
-                    : 'text-gray-300 hover:text-white',
+                    ? 'text-primary'
+                    : 'text-slate-300 hover:text-white',
                 )}
               >
                 <item.icon className="h-4 w-4 shrink-0" />
@@ -164,7 +164,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               <div
                 className={`overflow-hidden transition-all duration-200 ${isExpanded ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}
               >
-                <div className="ml-4 mt-0.5 space-y-0.5 border-l border-gray-800 pl-2">
+                <div className="ml-4 mt-0.5 space-y-0.5 border-l border-slate-800 pl-2">
                   {item.children.map((child) => {
                     const active = pathname === child.path
                     return (
@@ -174,8 +174,8 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                         className={cn(
                           'flex w-full items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors animate-fade-in',
                           active
-                            ? 'bg-blue-600 text-white'
-                            : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200',
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200',
                         )}
                       >
                         <child.icon className="h-3.5 w-3.5 shrink-0" />
@@ -195,14 +195,14 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export default function Sidebar() {
   return (
-    <aside className="hidden md:flex md:w-64 md:flex-col bg-gray-950 text-white">
-      <div className="flex h-16 items-center gap-2 border-b border-gray-800 px-6">
-        <GraduationCap className="h-6 w-6 text-blue-400" />
+    <aside className="hidden md:flex md:w-64 md:flex-col bg-slate-950 text-white">
+      <div className="flex h-16 items-center gap-2 border-b border-slate-800 px-6">
+        <GraduationCap className="h-6 w-6 text-primary" />
         <span className="text-lg font-bold tracking-tight">SGA UNFV</span>
       </div>
       <SidebarContent />
-      <div className="border-t border-gray-800 px-4 py-3">
-        <p className="text-xs text-gray-500">Sistema de Gestión Académica</p>
+      <div className="border-t border-slate-800 px-4 py-3">
+        <p className="text-xs text-slate-500">Sistema de Gestión Académica</p>
       </div>
     </aside>
   )
@@ -211,14 +211,14 @@ export default function Sidebar() {
 export function MobileSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onOpenChange={(v) => { if (!v) onClose() }}>
-      <SheetContent side="left" className="w-64 bg-gray-950 text-white p-0 border-r-gray-800">
-        <div className="flex h-16 items-center gap-2 border-b border-gray-800 px-6">
-          <GraduationCap className="h-6 w-6 text-blue-400" />
+      <SheetContent side="left" className="w-64 bg-slate-950 text-white p-0 border-r-slate-800">
+        <div className="flex h-16 items-center gap-2 border-b border-slate-800 px-6">
+          <GraduationCap className="h-6 w-6 text-primary" />
           <span className="text-lg font-bold tracking-tight">SGA UNFV</span>
         </div>
         <SidebarContent onNavigate={onClose} />
-        <div className="border-t border-gray-800 px-4 py-3">
-          <p className="text-xs text-gray-500">Sistema de Gestión Académica</p>
+        <div className="border-t border-slate-800 px-4 py-3">
+          <p className="text-xs text-slate-500">Sistema de Gestión Académica</p>
         </div>
       </SheetContent>
     </Sheet>

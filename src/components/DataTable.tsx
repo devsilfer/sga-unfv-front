@@ -107,9 +107,9 @@ export function DataTable<TData, TValue>({
 
       <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="[&_tr]:border-b-border/50">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-b-2 border-border/40">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.isPlaceholder ? null : (
@@ -122,7 +122,7 @@ export function DataTable<TData, TValue>({
                           asc: <ChevronUp className="h-3.5 w-3.5" />,
                           desc: <ChevronDown className="h-3.5 w-3.5" />,
                         }[header.column.getIsSorted() as string] ?? (
-                          <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+                          <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground/60" />
                         )}
                       </button>
                     )}

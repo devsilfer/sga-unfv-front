@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import FormModal from '@/components/FormModal'
+import Modal from '@/components/Modal'
 import { Input } from '@/components/ui/input'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -72,7 +72,7 @@ export default function CargoForm({ open, onOpenChange, editing }: Props) {
   }
 
   return (
-    <FormModal
+    <Modal
       open={open}
       onOpenChange={onOpenChange}
       title={editing ? 'Editar Cargo' : 'Nuevo Cargo'}
@@ -95,13 +95,13 @@ export default function CargoForm({ open, onOpenChange, editing }: Props) {
         <label className="text-sm font-medium">Área</label>
         <Select value={form.areaId ? String(form.areaId) : ""} items={areaItems} onValueChange={(v) => setForm({ ...form, areaId: Number(v) })}>
           <SelectTrigger><SelectValue placeholder="Seleccionar área (opcional)" /></SelectTrigger>
-          <SelectContent>
+          <SelectContent searchable searchPlaceholder="Buscar área...">
             {areasCombo.map((a) => (
               <SelectItem key={a.value} value={String(a.value)}>{a.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
-    </FormModal>
+    </Modal>
   )
 }

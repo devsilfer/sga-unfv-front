@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import FormModal from '@/components/FormModal'
+import Modal from '@/components/Modal'
 import { Input } from '@/components/ui/input'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -149,7 +149,7 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
   }
 
   return (
-    <FormModal
+    <Modal
       open={open}
       onOpenChange={onOpenChange}
       title={editing ? 'Editar Persona' : 'Nueva Persona'}
@@ -163,7 +163,7 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
           <label className="text-sm font-medium">Tipo Identificación</label>
           <Select value={form.tipoIdentificacionId ? String(form.tipoIdentificacionId) : ""} items={tipoIdItems} onValueChange={(v) => setForm({ ...form, tipoIdentificacionId: Number(v) })}>
             <SelectTrigger><SelectValue placeholder="Seleccionar tipo" /></SelectTrigger>
-            <SelectContent>
+            <SelectContent searchable>
               {tiposId.map((t) => (
                 <SelectItem key={t.value} value={String(t.value)}>{t.label}</SelectItem>
               ))}
@@ -216,7 +216,7 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
           <label className="text-sm font-medium">Género</label>
           <Select value={form.generoId ? String(form.generoId) : ""} items={generoItems} onValueChange={(v) => setForm({ ...form, generoId: Number(v) })}>
             <SelectTrigger><SelectValue placeholder="Seleccionar género" /></SelectTrigger>
-            <SelectContent>
+            <SelectContent searchable>
               {generos.map((g) => (
                 <SelectItem key={g.value} value={String(g.value)}>{g.label}</SelectItem>
               ))}
@@ -231,7 +231,7 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
           <label className="text-sm font-medium">Departamento</label>
           <Select value={departamento} onValueChange={(v) => { setDepartamento(v || ''); setProvincia(''); setForm({ ...form, ubigeoId: '' }) }}>
             <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-            <SelectContent>
+            <SelectContent searchable>
               {departamentos.map((d) => (
                 <SelectItem key={d} value={d}>{d}</SelectItem>
               ))}
@@ -242,7 +242,7 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
           <label className="text-sm font-medium">Provincia</label>
           <Select value={provincia} onValueChange={(v) => { setProvincia(v || ''); setForm({ ...form, ubigeoId: '' }) }} disabled={!departamento}>
             <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-            <SelectContent>
+            <SelectContent searchable>
               {provincias.map((p) => (
                 <SelectItem key={p} value={p}>{p}</SelectItem>
               ))}
@@ -253,7 +253,7 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
           <label className="text-sm font-medium">Distrito</label>
           <Select value={form.ubigeoId} items={distritoItems} onValueChange={(v) => setForm({ ...form, ubigeoId: v || '' })} disabled={!provincia}>
             <SelectTrigger><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-            <SelectContent>
+            <SelectContent searchable searchPlaceholder="Buscar distrito...">
               {distritos.map((d) => (
                 <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
               ))}
@@ -267,7 +267,7 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
           <label className="text-sm font-medium">País</label>
           <Select value={form.paisId ? String(form.paisId) : ""} items={paisItems} onValueChange={(v) => setForm({ ...form, paisId: Number(v) })}>
             <SelectTrigger><SelectValue placeholder="Seleccionar país (opcional)" /></SelectTrigger>
-            <SelectContent>
+            <SelectContent searchable>
               {paises.map((p) => (
                 <SelectItem key={p.value} value={String(p.value)}>{p.label}</SelectItem>
               ))}
@@ -279,6 +279,6 @@ export default function PersonaForm({ open, onOpenChange, editing }: Props) {
           <Input value={form.direccion} onChange={(e) => setForm({ ...form, direccion: e.target.value })} />
         </div>
       </div>
-    </FormModal>
+    </Modal>
   )
 }
