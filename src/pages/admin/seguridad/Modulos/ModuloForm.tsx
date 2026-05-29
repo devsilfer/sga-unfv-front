@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import FormModal from '@/components/FormModal'
+import Modal from '@/components/Modal'
 import { Input } from '@/components/ui/input'
 
 import { create as createModulo, update as updateModulo } from '@/modules/seguridad/modulos/services'
@@ -58,7 +58,7 @@ export default function ModuloForm({ open, onOpenChange, editing }: Props) {
   }
 
   return (
-    <FormModal
+    <Modal
       open={open}
       onOpenChange={onOpenChange}
       title={editing ? 'Editar Módulo' : 'Nuevo Módulo'}
@@ -77,6 +77,6 @@ export default function ModuloForm({ open, onOpenChange, editing }: Props) {
         <Input value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
         {errors.nombre && <p className="text-xs text-destructive">{errors.nombre}</p>}
       </div>
-    </FormModal>
+    </Modal>
   )
 }

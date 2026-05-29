@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import FormModal from '@/components/FormModal'
+import Modal from '@/components/Modal'
 import { Input } from '@/components/ui/input'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -80,7 +80,7 @@ export default function AdminForm({ open, onOpenChange, editing }: Props) {
   }
 
   return (
-    <FormModal
+    <Modal
       open={open}
       onOpenChange={onOpenChange}
       title={editing ? 'Editar Admin' : 'Nuevo Admin'}
@@ -93,7 +93,7 @@ export default function AdminForm({ open, onOpenChange, editing }: Props) {
         <label className="text-sm font-medium">Usuario</label>
         <Select value={form.usuarioId ? String(form.usuarioId) : ""} items={usuarioItems} onValueChange={(v) => setForm({ ...form, usuarioId: Number(v) })}>
           <SelectTrigger><SelectValue placeholder="Seleccionar usuario" /></SelectTrigger>
-          <SelectContent>
+          <SelectContent searchable searchPlaceholder="Buscar usuario...">
             {usuariosList.map((u) => (
               <SelectItem key={u.id} value={String(u.id)}>
                 {u.persona ? `${u.persona.nombres} ${u.persona.apellidoPaterno || ''}`.trim() : `Usuario #${u.id}`}
@@ -107,7 +107,7 @@ export default function AdminForm({ open, onOpenChange, editing }: Props) {
         <label className="text-sm font-medium">Cargo</label>
         <Select value={form.cargoId ? String(form.cargoId) : ""} items={cargoItems} onValueChange={(v) => setForm({ ...form, cargoId: Number(v) })}>
           <SelectTrigger><SelectValue placeholder="Seleccionar cargo" /></SelectTrigger>
-          <SelectContent>
+          <SelectContent searchable searchPlaceholder="Buscar cargo...">
             {cargosCombo.map((c) => (
               <SelectItem key={c.value} value={String(c.value)}>{c.label}</SelectItem>
             ))}
@@ -125,6 +125,6 @@ export default function AdminForm({ open, onOpenChange, editing }: Props) {
         <Input value={form.correo} onChange={(e) => setForm({ ...form, correo: e.target.value })} />
         {errors.correo && <p className="text-xs text-destructive">{errors.correo}</p>}
       </div>
-    </FormModal>
+    </Modal>
   )
 }

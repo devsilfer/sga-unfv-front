@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, Eye } from 'lucide-react'
 
 import { DataTable } from '@/components/DataTable'
 import { Button } from '@/components/ui/button'
@@ -10,11 +10,14 @@ import { Button } from '@/components/ui/button'
 import { findAll as findPersonas, softRemove as deletePersona } from '@/modules/seguridad/personas/services'
 import type { Persona } from '@/modules/seguridad/personas/types'
 import PersonaForm from './PersonaForm'
+import PersonaDetail from './PersonaDetail'
 
 export default function PersonasPage() {
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<Persona | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [detailPersona, setDetailPersona] = useState<Persona | null>(null)
   const [page, setPage] = useState(1)
 
   const { data: result, isLoading } = useQuery({
@@ -40,11 +43,13 @@ export default function PersonasPage() {
 
   const columns = useMemo<ColumnDef<Persona>[]>(
     () => [
-      { accessorKey: 'numeroDocumento', header: 'N° Documento' },
       {
-        id: 'tipoIdentificacion',
-        header: 'Tipo Ident.',
-        accessorFn: (row) => row.tipoIdentificacion?.nombre || '-',
+        id: 'numeroIdentificacion',
+        header: 'N° Identificación',
+        accessorFn: (row) =>
+          row.tipoIdentificacion
+            ? `${row.tipoIdentificacion.nombre} - ${row.numeroDocumento}`
+            : row.numeroDocumento,
       },
       {
         id: 'nombreCompleto',
@@ -54,20 +59,19 @@ export default function PersonasPage() {
       { accessorKey: 'correoPersonal', header: 'Correo' },
       { accessorKey: 'numCelular', header: 'Celular' },
       {
-        id: 'genero',
-        header: 'Género',
-        accessorFn: (row) => row.genero?.nombre || '-',
-      },
-      {
         id: 'acciones',
         header: '',
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon-sm" onClick={() => { setEditing(row.original); setOpen(true) }}
-              className="bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
+            <Button variant="ghost" size="icon-sm" tooltip="Ver detalle" onClick={() => { setDetailPersona(row.original); setDetailOpen(true) }}
+              className="bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800/30 dark:text-gray-400 dark:hover:bg-gray-800/50">
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon-sm" tooltip="Editar" onClick={() => { setEditing(row.original); setOpen(true) }}
+              className="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30">
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon-sm" onClick={() => {
+            <Button variant="ghost" size="icon-sm" tooltip="Eliminar" onClick={() => {
               if (confirm('¿Eliminar esta persona?')) deleteMutation.mutate(row.original.id)
             }}
               className="bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50">
@@ -98,11 +102,17 @@ export default function PersonasPage() {
         editing={editing}
       />
 
+      <PersonaDetail
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        persona={detailPersona}
+      />
+
       <DataTable
         columns={columns}
         data={personas}
-        searchKey="numeroDocumento"
-        searchPlaceholder="Buscar por documento..."
+        searchKey="nombreCompleto"
+        searchPlaceholder="Buscar por nombre..."
         loading={isLoading}
         page={page}
         pageCount={pageCount}

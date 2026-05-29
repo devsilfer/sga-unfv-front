@@ -17,7 +17,8 @@ export async function findAll(page?: number, limit?: number): Promise<Cargo[] | 
   const params: Record<string, number> = {}
   if (page) { params.page = page; params.limit = limit || 10 }
   const { data } = await apiClient.get('/cargos', { params })
-  return data
+  if (page) return data as PaginatedResponse<Cargo>
+  return Array.isArray(data) ? data : (data as PaginatedResponse<Cargo>).data
 }
 
 export async function findOne(id: number): Promise<Cargo> {

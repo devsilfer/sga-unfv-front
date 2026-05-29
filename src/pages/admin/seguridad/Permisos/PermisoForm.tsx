@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import FormModal from '@/components/FormModal'
+import Modal from '@/components/Modal'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
@@ -83,7 +83,7 @@ export default function PermisoForm({ open, onOpenChange, editing }: Props) {
   }
 
   return (
-    <FormModal
+    <Modal
       open={open}
       onOpenChange={onOpenChange}
       title={editing ? 'Editar Permiso' : 'Nuevo Permiso'}
@@ -96,7 +96,7 @@ export default function PermisoForm({ open, onOpenChange, editing }: Props) {
         <label className="text-sm font-medium">Cargo</label>
         <Select value={form.cargoId ? String(form.cargoId) : ""} items={cargoItems} onValueChange={(v) => setForm({ ...form, cargoId: Number(v) })}>
           <SelectTrigger><SelectValue placeholder="Seleccionar cargo" /></SelectTrigger>
-          <SelectContent>
+          <SelectContent searchable searchPlaceholder="Buscar cargo...">
             {cargos.map((c) => (
               <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
             ))}
@@ -108,7 +108,7 @@ export default function PermisoForm({ open, onOpenChange, editing }: Props) {
         <label className="text-sm font-medium">Módulo</label>
         <Select value={form.moduloId ? String(form.moduloId) : ""} items={moduloItems} onValueChange={(v) => setForm({ ...form, moduloId: Number(v) })}>
           <SelectTrigger><SelectValue placeholder="Seleccionar módulo" /></SelectTrigger>
-          <SelectContent>
+          <SelectContent searchable searchPlaceholder="Buscar módulo...">
             {modulos.map((m) => (
               <SelectItem key={m.id} value={String(m.id)}>{m.nombre}</SelectItem>
             ))}
@@ -134,6 +134,6 @@ export default function PermisoForm({ open, onOpenChange, editing }: Props) {
           Eliminar
         </label>
       </div>
-    </FormModal>
+    </Modal>
   )
 }

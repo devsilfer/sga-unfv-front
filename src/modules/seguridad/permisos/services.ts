@@ -11,7 +11,8 @@ export async function findAll(page?: number, limit?: number): Promise<Permiso[] 
   const params: Record<string, number> = {}
   if (page) { params.page = page; params.limit = limit || 10 }
   const { data } = await apiClient.get('/permisos', { params })
-  return data
+  if (page) return data as PaginatedResponse<Permiso>
+  return Array.isArray(data) ? data : (data as PaginatedResponse<Permiso>).data
 }
 
 export async function findOne(id: number): Promise<Permiso> {
