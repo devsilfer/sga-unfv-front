@@ -1,0 +1,2 @@
+// Docente-specific routes
+export {}

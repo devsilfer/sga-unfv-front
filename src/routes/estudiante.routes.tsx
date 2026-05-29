@@ -1,0 +1,2 @@
+// Estudiante-specific routes
+export {}

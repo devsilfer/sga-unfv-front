@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { useAuthStore } from '@/stores/auth.store'
-import { useThemeStore } from '@/stores/theme.store'
+import { useAuthStore } from '@/store/auth.store'
+import { useThemeStore } from '@/store/theme.store'
 import { LogOut, Bell, ChevronRight, Home, Menu, Sun, Moon } from 'lucide-react'
 import Sidebar, { MobileSidebar } from '@/components/Sidebar'
 

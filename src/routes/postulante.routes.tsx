@@ -1,0 +1,2 @@
+// Postulante-specific routes
+export {}
