@@ -1,33 +1,62 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth.store'
 import { LogIn } from 'lucide-react'
+import ReCAPTCHA from 'react-google-recaptcha'
+import { toast } from 'sonner'
+import axios from 'axios'
 
 export default function LoginPage() {
   const [numeroDocumento, setNumeroDocumento] = useState('')
   const [contrasenia, setContrasenia] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const login = useAuthStore((s) => s.login)
   const navigate = useNavigate()
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''
+
+  useEffect(() => {
+    if (!siteKey) {
+      console.warn('VITE_RECAPTCHA_SITE_KEY no está definida')
+    }
+  }, [siteKey])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
+
+    if (siteKey && !captchaToken) {
+      toast.error('Por favor, completa el CAPTCHA para continuar.')
+      return
+    }
+
     setLoading(true)
 
     try {
-      await login({ numeroDocumento, contrasenia })
+      const payload = siteKey
+        ? { numeroDocumento, contrasenia, captchaToken: captchaToken ?? undefined }
+        : { numeroDocumento, contrasenia }
+
+      await login(payload)
       navigate('/dashboard')
     } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as { response?: { data?: { message?: string } } }
-        setError(axiosErr.response?.data?.message || 'Credenciales inválidas')
-      } else {
-        setError('Error de conexión con el servidor')
+      let msg = 'Error al iniciar sesión. Intenta nuevamente.'
+
+      if (axios.isAxiosError(err)) {
+        msg =
+          (err.response?.data as { message?: string; error?: string })?.message ??
+          (err.response?.data as { message?: string; error?: string })?.error ??
+          err.message ??
+          msg
+      } else if (err instanceof Error) {
+        msg = err.message
       }
+
+      toast.error(msg)
     } finally {
       setLoading(false)
+      recaptchaRef.current?.reset()
+      setCaptchaToken(null)
     }
   }
 
@@ -69,8 +98,23 @@ export default function LoginPage() {
           />
         </div>
 
-        {error && (
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="flex justify-end">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-primary hover:underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
+
+        {siteKey && (
+          <div className="flex justify-center">
+            <ReCAPTCHA
+              sitekey={siteKey}
+              onChange={(token: string | null) => setCaptchaToken(token)}
+              ref={recaptchaRef}
+            />
+          </div>
         )}
 
         <button
